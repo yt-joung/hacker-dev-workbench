@@ -28,5 +28,11 @@
       "matches": ["<all_urls>"],
       "js": ["src/content/content.ts"]
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/content/hook.ts"],
+      "matches": ["<all_urls>"]
+    }
   ]
 }

@@ -1,4 +1,6 @@
 // [HackerDev] Content script listener
+import hookUrl from './hook?script';
+
 if (!(window as any).hackerDevLoaded) {
   (window as any).hackerDevLoaded = true;
 
@@ -35,6 +37,34 @@ if (!(window as any).hackerDevLoaded) {
     .hacker-reveal-green-active { animation: hackerPulseGreen 1.5s infinite !important; transition: all 0.3s ease !important; z-index: 2147483646 !important; }
   `;
   document.head.appendChild(style);
+
+  // 1. Inject Hook Script
+  const injectHook = () => {
+    try {
+      const script = document.createElement('script');
+      script.src = chrome.runtime.getURL(hookUrl);
+      script.onload = function (this: any) {
+        this.remove();
+      };
+      (document.head || document.documentElement).appendChild(script);
+    } catch (e) {
+      console.error("[HackerDev] Hook injection failed:", e);
+    }
+  };
+  injectHook();
+
+  // 2. Relay Hook Messages to Background
+  window.addEventListener("message", (event) => {
+    if (event.source !== window || !event.data || event.data.type !== "HACKERDEV_HOOK") return;
+    
+    // Relay to background script
+    chrome.runtime.sendMessage({
+      action: "RUNTIME_EVENT",
+      data: event.data.payload
+    }).catch(() => {
+        // Ignore errors when background is not ready
+    });
+  });
 
   const createLabel = (el: HTMLElement, text: string, type: 'pink' | 'green' = 'pink') => {
     const rect = el.getBoundingClientRect();

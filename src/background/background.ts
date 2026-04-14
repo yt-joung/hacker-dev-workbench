@@ -58,6 +58,36 @@ chrome.webRequest.onCompleted.addListener(
   { urls: ["<all_urls>"] }
 );
 
+// Listen for Runtime Events (from Hook -> Content Script -> Background)
+chrome.runtime.onMessage.addListener((request, sender) => {
+  if (request.action === 'RUNTIME_EVENT') {
+    const tabId = sender.tab?.id;
+    const tabUrl = sender.tab?.url;
+    
+    if (tabId && tabUrl && !tabUrl.startsWith('chrome://')) {
+      const siteOrigin = getOrigin(tabUrl);
+      
+      chrome.storage.local.get(['runtimeEvents'], (result) => {
+        const events = (result.runtimeEvents || {}) as Record<string, any[]>;
+        if (!events[siteOrigin]) events[siteOrigin] = [];
+        
+        events[siteOrigin].unshift({
+          ...request.data,
+          timeStamp: Date.now()
+        });
+
+        // Limit event logs
+        if (events[siteOrigin].length > 100) {
+          events[siteOrigin].pop();
+        }
+        
+        chrome.storage.local.set({ runtimeEvents: events });
+      });
+    }
+  }
+  return true;
+});
+
 // 참고: 사용자 피드백에 따라 데이터를 탭 단위가 아닌 Site(Origin) 단위로 저장.
 // 따라서 탭 종료 시 데이터를 날리지 않고 계속 유지합니다.
 // chrome.tabs.onRemoved 리스너는 제거되었습니다.
