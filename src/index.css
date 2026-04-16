@@ -53,28 +53,25 @@ header {
   gap: 10px;
 }
 
-nav {
+.nav-main {
   display: flex;
   padding: 0 0.5rem;
   background: rgba(17, 24, 39, 0.95);
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   gap: 4px;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
+.nav-main::-webkit-scrollbar { display: none; }
 
-nav::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-nav button {
+.nav-main button {
   background: transparent;
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  padding: 0.8rem 0.6rem;
+  padding: 0.8rem 0.4rem;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -84,26 +81,60 @@ nav button {
   min-width: fit-content;
 }
 
-nav button:hover {
+.nav-main button:hover {
   color: var(--text-primary);
   background: rgba(255, 255, 255, 0.05);
 }
 
-nav button.active {
+.nav-main button.active {
   color: var(--accent-color);
   background: rgba(0, 255, 157, 0.05);
 }
 
-nav button.active::after {
+.nav-main button.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 15%;
-  width: 70%;
-  height: 2px;
+  bottom: 0; left: 15%; width: 70%; height: 2px;
   background: var(--accent-color);
   box-shadow: 0 0 10px var(--accent-color);
   border-radius: 2px 2px 0 0;
+}
+
+.nav-sub {
+  display: flex;
+  padding: 0.5rem 0.5rem;
+  background: rgba(10, 15, 25, 0.9);
+  border-bottom: 1px solid var(--border-color);
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-sub::-webkit-scrollbar { display: none; }
+
+.nav-sub button {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-sub button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.nav-sub button.active {
+  background: rgba(0, 255, 157, 0.15);
+  border-color: var(--accent-color);
+  color: #fff;
 }
 
 .content-area {
@@ -332,3 +363,86 @@ nav button.active::after {
     justify-content: space-between;
     align-items: center;
 }
+
+/* ── 취약점 탭 색상 ── */
+nav button.tab-critical {
+  color: #ff0033;
+  animation: criticalPulse 1.8s ease-in-out infinite;
+}
+nav button.tab-high {
+  color: #ff6600;
+}
+
+@keyframes criticalPulse {
+  0%, 100% { text-shadow: 0 0 4px rgba(255,0,51,0.3); }
+  50%       { text-shadow: 0 0 12px rgba(255,0,51,0.8); }
+}
+
+/* ── 취약점 배지 버튼 (헤더) ── */
+.btn-vuln-badge {
+  background: rgba(255, 0, 51, 0.1);
+  color: #ff6600;
+  border: 1px solid #ff6600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-vuln-badge:hover {
+  background: rgba(255, 102, 0, 0.2);
+}
+.btn-vuln-badge.critical {
+  color: #ff0033;
+  border-color: #ff0033;
+  animation: criticalPulse 1.8s ease-in-out infinite;
+}
+
+/* ── 취약점 상세 카드 ── */
+.vuln-detail-card {
+  background: rgba(20, 10, 10, 0.8);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
+  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Storage 편집기 입력창 ── */
+.storage-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-family: monospace;
+  box-sizing: border-box;
+}
+.storage-input:focus {
+  outline: none;
+  border-color: var(--accent-secondary);
+}
+
+/* ── 보조 버튼 ── */
+.btn-secondary {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+
