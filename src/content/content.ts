@@ -36,7 +36,7 @@ if (!(window as any).hackerDevLoaded) {
     .hacker-reveal-active { animation: hackerPulse 1.5s infinite !important; transition: all 0.3s ease !important; z-index: 2147483646 !important; }
     .hacker-reveal-green-active { animation: hackerPulseGreen 1.5s infinite !important; transition: all 0.3s ease !important; z-index: 2147483646 !important; }
   `;
-  document.head.appendChild(style);
+  (document.head || document.documentElement).appendChild(style);
 
   // 1. Inject Hook Script
   const injectHook = () => {
@@ -55,15 +55,28 @@ if (!(window as any).hackerDevLoaded) {
 
   // 2. Relay Hook Messages to Background
   window.addEventListener("message", (event) => {
-    if (event.source !== window || !event.data || event.data.type !== "HACKERDEV_HOOK") return;
+    // 컨텍스트가 무효화되었는지 확인 (확장 프로그램 재로드/업데이트 시)
+    if (!chrome.runtime || !chrome.runtime.id) return;
     
-    // Relay to background script
-    chrome.runtime.sendMessage({
-      action: "RUNTIME_EVENT",
-      data: event.data.payload
-    }).catch(() => {
-        // Ignore errors when background is not ready
-    });
+    if (event.source !== window || !event.data) return;
+    
+    const isHackerDevMessage = 
+      event.data.type === "HACKERDEV_HOOK" || 
+      (typeof event.data.type === 'string' && event.data.type.startsWith("HACKERDEV_EVENT_"));
+
+    if (!isHackerDevMessage) return;
+    
+    try {
+      // Relay to background script
+      chrome.runtime.sendMessage({
+        action: "RUNTIME_EVENT",
+        data: event.data.payload
+      }).catch(() => {
+          // Ignore errors when background is not ready
+      });
+    } catch (e) {
+      // "Extension context invalidated" 등의 오류 방지
+    }
   });
 
   const createLabel = (el: HTMLElement, text: string, type: 'pink' | 'green' = 'pink') => {
